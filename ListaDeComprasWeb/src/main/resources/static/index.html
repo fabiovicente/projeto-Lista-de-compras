@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Compras</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: #2c7a3a;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* --- Formulário --- */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-group input {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #2c7a3a;
+        }
+
+        .btn-adicionar {
+            padding: 10px 20px;
+            background-color: #2c7a3a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-adicionar:hover {
+            background-color: #235f2e;
+        }
+
+        /* --- Lista de itens --- */
+        .lista-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .lista-header h2 {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .total-badge {
+            background-color: #e8f5e9;
+            color: #2c7a3a;
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+        }
+
+        #lista-itens {
+            list-style: none;
+        }
+
+        #lista-itens li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #e8e8e8;
+            transition: background-color 0.15s;
+        }
+
+        #lista-itens li:hover {
+            background-color: #f0f0f0;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .item-nome {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .item-detalhe {
+            font-size: 0.82rem;
+            color: #888;
+        }
+
+        .item-preco {
+            font-weight: bold;
+            color: #2c7a3a;
+            font-size: 0.95rem;
+            margin-right: 16px;
+        }
+
+        .btn-remover {
+            background: none;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            border-radius: 6px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: all 0.2s;
+        }
+
+        .btn-remover:hover {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        /* --- Estado vazio --- */
+        .vazio {
+            text-align: center;
+            color: #aaa;
+            padding: 30px 0;
+            font-size: 0.95rem;
+        }
+
+        /* --- Mensagem de feedback --- */
+        #mensagem {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        #mensagem.sucesso {
+            background-color: #d4edda;
+            color: #2c7a3a;
+            display: block;
+        }
+
+        #mensagem.erro {
+            background-color: #f8d7da;
+            color: #c0392b;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛒 Lista de Compras</h1>
+
+    <!-- Mensagem de feedback -->
+    <div id="mensagem"></div>
+
+    <!-- Formulário para adicionar item -->
+    <div class="card">
+        <h2>Adicionar item</h2>
+        <div class="form-group">
+            <input type="text"     id="nome"       placeholder="Nome do item"  />
+            <input type="number"   id="quantidade" placeholder="Qtd" min="1" />
+            <input type="number"   id="preco"      placeholder="Preço (R$)" min="0.01" step="0.01" />
+            <button class="btn-adicionar" onclick="adicionarItem()">Adicionar</button>
+        </div>
+    </div>
+
+    <!-- Lista de itens -->
+    <div class="card">
+        <div class="lista-header">
+            <h2>Itens na lista</h2>
+            <span class="total-badge" id="total">Total: R$ 0,00</span>
+        </div>
+        <ul id="lista-itens">
+            <li class="vazio">Nenhum item na lista.</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    const API = 'http://localhost:8080';
+
+    // Carrega a lista ao abrir a página
+    window.onload = carregarLista;
+
+    // Busca todos os itens da API e renderiza na tela
+    async function carregarLista() {
+        try {
+            const resposta = await fetch(`${API}/itens`);
+            const itens = await resposta.json();
+            renderizarLista(itens);
+            await atualizarTotal();
+        } catch (e) {
+            mostrarMensagem('Não foi possível conectar à API. Verifique se o servidor está rodando.', 'erro');
+        }
+    }
+
+    // Monta o HTML da lista com os itens recebidos da API
+    function renderizarLista(itens) {
+        const ul = document.getElementById('lista-itens');
+
+        if (itens.length === 0) {
+            ul.innerHTML = '<li class="vazio">Nenhum item na lista.</li>';
+            return;
+        }
+
+        ul.innerHTML = itens.map(item => `
+            <li>
+                <div class="item-info">
+                    <span class="item-nome">${item.nome}</span>
+                    <span class="item-detalhe">Quantidade: ${item.quantidade}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="item-preco">R$ ${(item.quantidade * item.preco).toFixed(2).replace('.', ',')}</span>
+                    <button class="btn-remover" onclick="removerItem(${item.id})">Remover</button>
+                </div>
+            </li>
+        `).join('');
+    }
+
+    // Envia um POST para a API com os dados do formulário
+    async function adicionarItem() {
+        const nome      = document.getElementById('nome').value.trim();
+        const quantidade = parseInt(document.getElementById('quantidade').value);
+        const preco     = parseFloat(document.getElementById('preco').value);
+
+        // Validação básica no frontend
+        if (!nome) {
+            mostrarMensagem('Digite o nome do item.', 'erro');
+            return;
+        }
+        if (!quantidade || quantidade < 1) {
+            mostrarMensagem('A quantidade deve ser no mínimo 1.', 'erro');
+            return;
+        }
+        if (!preco || preco <= 0) {
+            mostrarMensagem('Digite um preço válido.', 'erro');
+            return;
+        }
+
+        try {
+            const resposta = await fetch(`${API}/itens`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, quantidade, preco })
+            });
+
+            if (resposta.ok) {
+                limparFormulario();
+                mostrarMensagem(`"${nome}" adicionado com sucesso!`, 'sucesso');
+                carregarLista();
+            } else {
+                mostrarMensagem('Erro ao adicionar item. Verifique os dados.', 'erro');
+            }
+        } catch (e) {
+            mostrarMensagem('Erro de conexão com a API.', 'erro');
+        }
+    }
+
+    // Envia um DELETE para a API com o ID do item
+    async function removerItem(id) {
+        try {
+            const resposta = await fetch(`${API}/itens/${id}`, { method: 'DELETE' });
+
+            if (resposta.ok) {
+                mostrarMensagem('Item removido com sucesso!', 'sucesso');
+                carregarLista();
+            } else {
+                mostrarMensagem('Erro ao remover item.', 'erro');
+            }
+        } catch (e) {
+            mostrarMensagem('Erro de conexão com a API.', 'erro');
+        }
+    }
+
+    // Busca o total da API e atualiza o badge
+    async function atualizarTotal() {
+        try {
+            const resposta = await fetch(`${API}/itens/total`);
+            const dados = await resposta.json();
+            document.getElementById('total').textContent =
+                'Total: R$ ' + dados.total.toFixed(2).replace('.', ',');
+        } catch (e) {
+            // silencia erro no total para não sobrepor mensagens mais importantes
+        }
+    }
+
+    // Limpa os campos do formulário
+    function limparFormulario() {
+        document.getElementById('nome').value = '';
+        document.getElementById('quantidade').value = '';
+        document.getElementById('preco').value = '';
+    }
+
+    // Exibe uma mensagem de feedback e some após 3 segundos
+    function mostrarMensagem(texto, tipo) {
+        const el = document.getElementById('mensagem');
+        el.textContent = texto;
+        el.className = tipo;
+        setTimeout(() => { el.className = ''; el.style.display = 'none'; }, 3000);
+    }
+</script>
+
+</body>
+</html>
